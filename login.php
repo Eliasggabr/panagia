@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
-
+    
     if ($user && password_verify($senha, $user['senha'])) {
         $_SESSION['logado'] = true;
         $_SESSION['id'] = $user['id'];
