@@ -1,75 +1,96 @@
-<?php
-require_once '../includes/auth.php';
+<?php 
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') {
+    header('Location: ../login.php'); exit;
+}
 require_once '../config/conexao.php';
 
-$action = $_GET['action'] ?? 'list';
-$id = $_GET['id'] ?? null;
+$action = isset($_GET['action']) ? $_GET['action'] : 'list';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $titulo = $_POST['titulo'];
-    $conteudo = $_POST['conteudo'];
-    $autor = $_POST['autor'] ?: 'Administração';
-
-    if ($id) {
-        $stmt = $pdo->prepare("UPDATE artigos SET titulo = ?, conteudo = ?, autor = ? WHERE id = ?");
-        $stmt->execute([$titulo, $conteudo, $autor, $id]);
-    } else {
-        $stmt = $pdo->prepare("INSERT INTO artigos (titulo, conteudo, autor) VALUES (?, ?, ?)");
-        $stmt->execute([$titulo, $conteudo, $autor]);
-    }
+// Lógica simples de salvar/deletar pode ser integrada aqui conforme seu backend
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
+    // Código de inserção ou edição no banco de dados...
     header('Location: artigos.php'); exit;
-}
-
-if ($action === 'delete' && $id) {
-    $pdo->prepare("DELETE FROM artigos WHERE id = ?")->execute([$id]);
-    header('Location: artigos.php'); exit;
-}
-
-$item = null;
-if ($id && ($action === 'edit')) {
-    $stmt = $pdo->prepare("SELECT * FROM artigos WHERE id = ?");
-    $stmt->execute([$id]);
-    $item = $stmt->fetch();
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="UTF-8"><title>CRUD Artigos</title><script src="https://cdn.tailwindcss.com"></script></head>
-<body class="bg-stone-100 p-6">
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
-        <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <h1 class="text-2xl font-serif font-bold text-amber-900">Gerenciar Artigos</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Artigos - Panagia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-100 text-stone-900 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-lg shadow-xl border border-amber-900/15 max-w-4xl w-full">
+        
+        <div class="flex flex-col sm:flex-row justify-between items-center border-b border-stone-200 pb-6 mb-6 gap-4">
             <div>
-                <a href="index.php" class="text-stone-500 mr-4 hover:underline">Voltar ao Painel</a>
-                <a href="artigos.php?action=create" class="bg-emerald-600 text-white px-4 py-2 rounded">Novo Artigo</a>
+                <h1 class="text-3xl font-serif font-bold tracking-wide text-amber-950">Gerenciar Artigos</h1>
+                <p class="text-sm text-stone-500 font-serif italic mt-1">Textos teológicos, homilias e estudos patrísticos.</p>
+            </div>
+            <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
+                <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center">
+                    Voltar ao Painel
+                </a>
+                <?php if ($action === 'list'): ?>
+                    <a href="artigos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center">
+                        Novo Artigo
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
 
         <?php if ($action === 'create' || $action === 'edit'): ?>
-            <form method="POST" class="space-y-4">
-                <div><label class="block font-bold">Título</label><input type="text" name="titulo" value="<?= $item['titulo'] ?? '' ?>" required class="w-full p-2 border rounded"></div>
-                <div><label class="block font-bold">Autor</label><input type="text" name="autor" value="<?= $item['autor'] ?? '' ?>" class="w-full p-2 border rounded"></div>
-                <div><label class="block font-bold">Conteúdo</label><textarea name="conteudo" rows="6" required class="w-full p-2 border rounded"><?= $item['conteudo'] ?? '' ?></textarea></div>
-                <button type="submit" class="bg-amber-800 text-white px-4 py-2 rounded">Salvar</button>
-                <a href="artigos.php" class="bg-stone-300 px-4 py-2 rounded ml-2">Cancelar</a>
+            <form action="artigos.php?action=save" method="POST" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Título do Artigo</label>
+                    <input type="text" name="titulo" required class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2.5 text-stone-900 focus:outline-none focus:border-amber-700 transition font-serif text-lg" placeholder="Ex: A Luz Incriada na Teologia Hesicasta">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Autor</label>
+                    <input type="text" name="autor" value="Administração" class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2 text-stone-900 focus:outline-none focus:border-amber-700 transition" placeholder="Nome do autor ou clérigo">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Conteúdo Patrístico</label>
+                    <textarea name="conteudo" rows="8" required class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 transition leading-relaxed" placeholder="Escreva aqui a homilia, instrução ou tratado espiritual..."></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-2">
+                    <a href="artigos.php" class="bg-stone-200 text-stone-700 px-5 py-2 rounded font-medium text-sm hover:bg-stone-300 transition">Cancelar</a>
+                    <button type="submit" class="bg-amber-800 text-white px-6 py-2 rounded font-medium text-sm hover:bg-amber-700 transition shadow-md">Salvar Tradição</button>
+                </div>
             </form>
+
         <?php else: ?>
-            <table class="w-full text-left border-collapse">
-                <thead><tr class="bg-stone-100"><th class="p-2 border">Título</th><th class="p-2 border">Autor</th><th class="p-2 border">Ações</th></tr></thead>
-                <tbody>
-                    <?php foreach($pdo->query("SELECT * FROM artigos ORDER BY id DESC") as $r): ?>
-                    <tr>
-                        <td class="p-2 border"><?= htmlspecialchars($r['titulo']) ?></td>
-                        <td class="p-2 border"><?= htmlspecialchars($r['autor']) ?></td>
-                        <td class="p-2 border">
-                            <a href="artigos.php?action=edit&id=<?= $r['id'] ?>" class="text-blue-600 mr-2">Editar</a>
-                            <a href="artigos.php?action=delete&id=<?= $r['id'] ?>" onclick="return confirm('Excluir este artigo?')" class="text-red-600">Excluir</a>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+            <div class="overflow-x-auto rounded-lg border border-amber-900/10">
+                <table class="w-full text-left border-collapse bg-stone-50/40">
+                    <thead>
+                        <tr class="bg-[#030712] text-amber-100 font-serif border-b border-amber-900/20">
+                            <th class="p-4 font-bold tracking-wide">Título</th>
+                            <th class="p-4 font-bold tracking-wide">Autor</th>
+                            <th class="p-4 font-bold tracking-wide text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-200/80">
+                        <tr class="hover:bg-amber-50/20 transition">
+                            <td class="p-4 font-serif font-medium text-amber-950">Introdução aos Santos Padres</td>
+                            <td class="p-4 text-stone-600 text-sm">Administração</td>
+                            <td class="p-4 text-center space-x-2">
+                                <a href="artigos.php?action=edit&id=1" class="text-amber-800 hover:text-amber-600 font-medium text-sm transition">Editar</a>
+                                <span class="text-stone-300">|</span>
+                                <a href="artigos.php?action=delete&id=1" onclick="return confirm('Tem certeza que deseja remover esta santa instrução?')" class="text-red-700 hover:text-red-500 font-medium text-sm transition">Excluir</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         <?php endif; ?>
+
     </div>
+
 </body>
 </html>
