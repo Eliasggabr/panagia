@@ -1,6 +1,6 @@
 <?php 
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
-// Proteção simples: se não for admin, chuta de volta para o login ou index
+
 if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') {
     header('Location: ../login.php');
     exit;

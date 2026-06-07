@@ -7,11 +7,47 @@ require_once '../config/conexao.php';
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 
-// Lógica simples de salvar/deletar pode ser integrada aqui conforme seu backend
+// Salvar artigo
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
-    // Código de inserção ou edição no banco de dados...
+    $titulo   = trim($_POST['titulo']);
+    $autor    = trim($_POST['autor']);
+    $conteudo = trim($_POST['conteudo']);
+    $id       = isset($_POST['id']) ? intval($_POST['id']) : 0;
+
+    if (!empty($titulo) && !empty($conteudo)) {
+        if ($id > 0) {
+            // Editar artigo
+            $stmt = $pdo->prepare("UPDATE artigos SET titulo = ?, autor = ?, conteudo = ? WHERE id = ?");
+            $stmt->execute([$titulo, $autor, $conteudo, $id]);
+        } else {
+            // Criar artigo
+            $stmt = $pdo->prepare("INSERT INTO artigos (titulo, autor, conteudo) VALUES (?, ?, ?)");
+            $stmt->execute([$titulo, $autor, $conteudo]);
+        }
+    }
     header('Location: artigos.php'); exit;
 }
+
+// Deletar 
+if ($action === 'delete' && isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    $stmt = $pdo->prepare("DELETE FROM artigos WHERE id = ?");
+    $stmt->execute([$id]);
+    header('Location: artigos.php'); exit;
+}
+
+// Busca de dados
+$artigo_editar = null;
+if ($action === 'edit' && isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    $stmt = $pdo->prepare("SELECT * FROM artigos WHERE id = ?");
+    $stmt->execute([$id]);
+    $artigo_editar = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Busca os artigos cadastrados 
+$stmt_lista = $pdo->query("SELECT * FROM artigos ORDER BY id DESC");
+$artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -31,11 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
                 <p class="text-sm text-stone-500 font-serif italic mt-1">Textos teológicos, homilias e estudos patrísticos.</p>
             </div>
             <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
-                <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center">
+                <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center w-full sm:w-auto">
                     Voltar ao Painel
                 </a>
                 <?php if ($action === 'list'): ?>
-                    <a href="artigos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center">
+                    <a href="artigos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center w-full sm:w-auto">
                         Novo Artigo
                     </a>
                 <?php endif; ?>
@@ -44,24 +80,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
 
         <?php if ($action === 'create' || $action === 'edit'): ?>
             <form action="artigos.php?action=save" method="POST" class="space-y-5">
-                <div>
-                    <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Título do Artigo</label>
-                    <input type="text" name="titulo" required class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2.5 text-stone-900 focus:outline-none focus:border-amber-700 transition font-serif text-lg" placeholder="Ex: A Luz Incriada na Teologia Hesicasta">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Autor</label>
-                    <input type="text" name="autor" value="Administração" class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2 text-stone-900 focus:outline-none focus:border-amber-700 transition" placeholder="Nome do autor ou clérigo">
+                <input type="hidden" name="id" value="<?= $artigo_editar ? $artigo_editar['id'] : '' ?>">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Título do Artigo</label>
+                        <input type="text" name="titulo" required 
+                               value="<?= $artigo_editar ? htmlspecialchars($artigo_editar['titulo']) : '' ?>" 
+                               class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2.5 text-stone-900 focus:outline-none focus:border-amber-700 transition font-serif text-lg" 
+                               placeholder="Ex: Pela defesa do sacramento do Batismo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Autor</label>
+                        <input type="text" name="autor" 
+                               value="<?= $artigo_editar ? htmlspecialchars($artigo_editar['autor']) : 'Admin - Elias' ?>" 
+                               class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2.5 text-stone-900 focus:outline-none focus:border-amber-700 transition" 
+                               placeholder="Ex: Admin - Elias">
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Conteúdo Patrístico</label>
-                    <textarea name="conteudo" rows="8" required class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 transition leading-relaxed" placeholder="Escreva aqui a homilia, instrução ou tratado espiritual..."></textarea>
+                    <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Conteúdo Patrístico / Teológico</label>
+                    <textarea name="conteudo" rows="12" required 
+                              class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 transition leading-relaxed font-serif text-base" 
+                              placeholder="Escreva aqui o estudo, reflexão ou homilia..."><?= $artigo_editar ? htmlspecialchars($artigo_editar['conteudo']) : '' ?></textarea>
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-2">
                     <a href="artigos.php" class="bg-stone-200 text-stone-700 px-5 py-2 rounded font-medium text-sm hover:bg-stone-300 transition">Cancelar</a>
-                    <button type="submit" class="bg-amber-800 text-white px-6 py-2 rounded font-medium text-sm hover:bg-amber-700 transition shadow-md">Salvar Tradição</button>
+                    <button type="submit" class="bg-amber-800 text-white px-6 py-2 rounded font-medium text-sm hover:bg-amber-700 transition shadow-md">
+                        <?= $artigo_editar ? 'Atualizar Artigo' : 'Publicar Artigo' ?>
+                    </button>
                 </div>
             </form>
 
@@ -76,15 +125,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-200/80">
-                        <tr class="hover:bg-amber-50/20 transition">
-                            <td class="p-4 font-serif font-medium text-amber-950">Introdução aos Santos Padres</td>
-                            <td class="p-4 text-stone-600 text-sm">Administração</td>
-                            <td class="p-4 text-center space-x-2">
-                                <a href="artigos.php?action=edit&id=1" class="text-amber-800 hover:text-amber-600 font-medium text-sm transition">Editar</a>
-                                <span class="text-stone-300">|</span>
-                                <a href="artigos.php?action=delete&id=1" onclick="return confirm('Tem certeza que deseja remover esta santa instrução?')" class="text-red-700 hover:text-red-500 font-medium text-sm transition">Excluir</a>
-                            </td>
-                        </tr>
+                        <?php if (empty($artigos)): ?>
+                            <tr>
+                                <td colspan="3" class="p-4 text-center text-stone-500 font-serif italic">Nenhum artigo publicado no momento.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($artigos as $art): ?>
+                                <tr class="hover:bg-amber-50/20 transition">
+                                    <td class="p-4 font-serif font-medium text-amber-950"><?= htmlspecialchars($art['titulo']) ?></td>
+                                    <td class="p-4 text-stone-600 text-sm font-medium"><?= htmlspecialchars($art['autor']) ?></td>
+                                    <td class="p-4 text-center space-x-2">
+                                        <a href="artigos.php?action=edit&id=<?= $art['id'] ?>" class="text-amber-800 hover:text-amber-600 font-medium text-sm transition">Editar</a>
+                                        <span class="text-stone-300">|</span>
+                                        <a href="artigos.php?action=delete&id=<?= $art['id'] ?>" 
+                                           onclick="return confirm('Deseja realmente excluir este artigo teológico?')" 
+                                           class="text-red-700 hover:text-red-500 font-medium text-sm transition">Excluir</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

@@ -6,6 +6,54 @@ if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') {
 require_once '../config/conexao.php';
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
+
+
+// Inserir e atualizar
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
+    $nome      = trim($_POST['nome']);
+    $dia_festa = trim($_POST['dia_festa']);
+    $biografia = trim($_POST['biografia']);
+    $id        = isset($_POST['id']) ? intval($_POST['id']) : 0;
+
+    if (!empty($nome) && !empty($biografia)) {
+        if ($id > 0) {
+            // Editar  santo 
+            $stmt = $pdo->prepare("UPDATE santos SET nome = ?, dia_festa = ?, biografia = ? WHERE id = ?");
+            $stmt->execute([$nome, $dia_festa, $biografia, $id]);
+        } else {
+            // Inserir novo santo
+            $stmt = $pdo->prepare("INSERT INTO santos (nome, dia_festa, biografia) VALUES (?, ?, ?)");
+            $stmt->execute([$nome, $dia_festa, $biografia]);
+        }
+    }
+    header('Location: santos.php'); exit;
+}
+
+
+// Deletar santo
+
+if ($action === 'delete' && isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    $stmt = $pdo->prepare("DELETE FROM santos WHERE id = ?");
+    $stmt->execute([$id]);
+    header('Location: santos.php'); exit;
+}
+
+
+// Busca de dados
+
+$santo_editar = null;
+if ($action === 'edit' && isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    $stmt = $pdo->prepare("SELECT * FROM santos WHERE id = ?");
+    $stmt->execute([$id]);
+    $santo_editar = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Busca todos os santos
+$stmt_lista = $pdo->query("SELECT * FROM santos ORDER BY id DESC");
+$santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -25,11 +73,11 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'list';
                 <p class="text-sm text-stone-500 font-serif italic mt-1">Alimentar memórias, biografias e memórias litúrgicas.</p>
             </div>
             <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
-                <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center">
+                <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center w-full sm:w-auto">
                     Voltar ao Painel
                 </a>
                 <?php if ($action === 'list'): ?>
-                    <a href="santos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center">
+                    <a href="santos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center w-full sm:w-auto">
                         Novo Santo
                     </a>
                 <?php endif; ?>
@@ -38,25 +86,37 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 
         <?php if ($action === 'create' || $action === 'edit'): ?>
             <form action="santos.php?action=save" method="POST" class="space-y-5">
+                <input type="hidden" name="id" value="<?= $santo_editar ? $santo_editar['id'] : '' ?>">
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div class="md:col-span-2">
                         <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Nome do Santo / Justo</label>
-                        <input type="text" name="nome" required class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2.5 text-stone-900 focus:outline-none focus:border-amber-700 transition font-serif text-lg" placeholder="Ex: São João Crisóstomo">
+                        <input type="text" name="nome" required 
+                               value="<?= $santo_editar ? htmlspecialchars($santo_editar['nome']) : '' ?>" 
+                               class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2.5 text-stone-900 focus:outline-none focus:border-amber-700 transition font-serif text-lg" 
+                               placeholder="Ex: São João Crisóstomo">
                     </div>
                     <div>
                         <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Festa Litúrgica</label>
-                        <input type="text" name="dia_festa" required class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2.5 text-stone-900 focus:outline-none focus:border-amber-700 transition" placeholder="Ex: 13 de Novembro">
+                        <input type="text" name="dia_festa" required 
+                               value="<?= $santo_editar ? htmlspecialchars($santo_editar['dia_festa']) : '' ?>" 
+                               class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-2.5 text-stone-900 focus:outline-none focus:border-amber-700 transition" 
+                               placeholder="Ex: 13 de Novembro">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-serif font-bold text-amber-950 mb-1">Santa Biografia / Vida</label>
-                    <textarea name="biografia" rows="8" required class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 transition leading-relaxed" placeholder="Relate aqui os milagres, martírio e a santa jornada espiritual..."></textarea>
+                    <textarea name="biografia" rows="8" required 
+                              class="w-full bg-stone-50/60 border border-amber-900/20 rounded px-4 py-3 text-stone-900 focus:outline-none focus:border-amber-700 transition leading-relaxed" 
+                              placeholder="Relate aqui os milagres, martírio e a santa jornada espiritual..."><?= $santo_editar ? htmlspecialchars($santo_editar['biografia']) : '' ?></textarea>
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-2">
                     <a href="santos.php" class="bg-stone-200 text-stone-700 px-5 py-2 rounded font-medium text-sm hover:bg-stone-300 transition">Cancelar</a>
-                    <button type="submit" class="bg-amber-800 text-white px-6 py-2 rounded font-medium text-sm hover:bg-amber-700 transition shadow-md">Gravar no Livro</button>
+                    <button type="submit" class="bg-amber-800 text-white px-6 py-2 rounded font-medium text-sm hover:bg-amber-700 transition shadow-md">
+                        <?= $santo_editar ? 'Atualizar no Livro' : 'Gravar no Livro' ?>
+                    </button>
                 </div>
             </form>
 
@@ -71,15 +131,25 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'list';
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-200/80">
-                        <tr class="hover:bg-amber-50/20 transition">
-                            <td class="p-4 font-serif font-medium text-amber-950">Santo André, o Protocolado</td>
-                            <td class="p-4 text-amber-900 text-sm font-medium">30 de Novembro</td>
-                            <td class="p-4 text-center space-x-2">
-                                <a href="santos.php?action=edit&id=1" class="text-amber-800 hover:text-amber-600 font-medium text-sm transition">Editar</a>
-                                <span class="text-stone-300">|</span>
-                                <a href="santos.php?action=delete&id=1" onclick="return confirm('Deseja retirar este santo do Sinaxário ativo?')" class="text-red-700 hover:text-red-500 font-medium text-sm transition">Excluir</a>
-                            </td>
-                        </tr>
+                        <?php if (empty($santos)): ?>
+                            <tr>
+                                <td colspan="3" class="p-4 text-center text-stone-500 font-serif italic">Nenhum santo registrado no momento.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($santos as $snt): ?>
+                                <tr class="hover:bg-amber-50/20 transition">
+                                    <td class="p-4 font-serif font-medium text-amber-950"><?= htmlspecialchars($snt['nome']) ?></td>
+                                    <td class="p-4 text-amber-900 text-sm font-medium"><?= htmlspecialchars($snt['dia_festa']) ?></td>
+                                    <td class="p-4 text-center space-x-2">
+                                        <a href="santos.php?action=edit&id=<?= $snt['id'] ?>" class="text-amber-800 hover:text-amber-600 font-medium text-sm transition">Editar</a>
+                                        <span class="text-stone-300">|</span>
+                                        <a href="santos.php?action=delete&id=<?= $snt['id'] ?>" 
+                                           onclick="return confirm('Deseja retirar este santo do Sinaxário ativo?')" 
+                                           class="text-red-700 hover:text-red-500 font-medium text-sm transition">Excluir</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
