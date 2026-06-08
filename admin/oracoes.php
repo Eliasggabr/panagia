@@ -7,7 +7,6 @@ require_once '../config/conexao.php';
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 
-// Criação e edição
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
     $titulo    = trim($_POST['titulo']);
@@ -17,11 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
 
     if (!empty($titulo) && !empty($texto)) {
         if ($id > 0) {
-            // Editar oração
+
             $stmt = $pdo->prepare("UPDATE oracoes SET titulo = ?, categoria = ?, texto = ? WHERE id = ?");
             $stmt->execute([$titulo, $categoria, $texto, $id]);
         } else {
-            // Inseir oração
+            
             $stmt = $pdo->prepare("INSERT INTO oracoes (titulo, categoria, texto) VALUES (?, ?, ?)");
             $stmt->execute([$titulo, $categoria, $texto]);
         }
@@ -29,8 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
     header('Location: oracoes.php'); exit;
 }
 
-
-// Deletar oração
 
 if ($action === 'delete' && isset($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -40,8 +37,6 @@ if ($action === 'delete' && isset($_GET['id'])) {
 }
 
 
-// Busca de dados
-
 $oracao_editar = null;
 if ($action === 'edit' && isset($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -50,7 +45,6 @@ if ($action === 'edit' && isset($_GET['id'])) {
     $oracao_editar = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Busca todas as orações
 $stmt_lista = $pdo->query("SELECT * FROM oracoes ORDER BY id DESC");
 $oracoes = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
 ?>

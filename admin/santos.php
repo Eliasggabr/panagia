@@ -8,8 +8,6 @@ require_once '../config/conexao.php';
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 
 
-// Inserir e atualizar
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
     $nome      = trim($_POST['nome']);
     $dia_festa = trim($_POST['dia_festa']);
@@ -18,11 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
 
     if (!empty($nome) && !empty($biografia)) {
         if ($id > 0) {
-            // Editar  santo 
+            
             $stmt = $pdo->prepare("UPDATE santos SET nome = ?, dia_festa = ?, biografia = ? WHERE id = ?");
             $stmt->execute([$nome, $dia_festa, $biografia, $id]);
         } else {
-            // Inserir novo santo
+            
             $stmt = $pdo->prepare("INSERT INTO santos (nome, dia_festa, biografia) VALUES (?, ?, ?)");
             $stmt->execute([$nome, $dia_festa, $biografia]);
         }
@@ -30,18 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
     header('Location: santos.php'); exit;
 }
 
-
-// Deletar santo
-
 if ($action === 'delete' && isset($_GET['id'])) {
     $id = intval($_GET['id']);
     $stmt = $pdo->prepare("DELETE FROM santos WHERE id = ?");
     $stmt->execute([$id]);
     header('Location: santos.php'); exit;
 }
-
-
-// Busca de dados
 
 $santo_editar = null;
 if ($action === 'edit' && isset($_GET['id'])) {
@@ -51,7 +43,6 @@ if ($action === 'edit' && isset($_GET['id'])) {
     $santo_editar = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Busca todos os santos
 $stmt_lista = $pdo->query("SELECT * FROM santos ORDER BY id DESC");
 $santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
 ?>

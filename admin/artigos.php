@@ -1,42 +1,41 @@
 <?php 
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') {
+if (session_status() === PHP_SESSION_NONE) { session_start(); } // verifica se a sessão já foi iniciada, se não, inicia a sessão
+
+if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') { // esse é o código porteiro, que verifica se o usuário está logado e se é do tipo admin, se não, te taca pra página de login
     header('Location: ../login.php'); exit;
 }
-require_once '../config/conexao.php';
+require_once '../config/conexao.php'; // pega o pdo lá
 
-$action = isset($_GET['action']) ? $_GET['action'] : 'list';
+$action = isset($_GET['action']) ? $_GET['action'] : 'list'; // pega o action da url com o valor dela, se ela n tiver o valor, ela pega list pra listar os arquivos
 
-// Salvar artigo
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
-    $titulo   = trim($_POST['titulo']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') { // verifica se o método é post e se o action é save, se for, ele salva ou edita o artigo
+    $titulo   = trim($_POST['titulo']); // pega os valores enviados do formulário, o trim é pra tirar os espaços em branco no começo e no final
     $autor    = trim($_POST['autor']);
     $conteudo = trim($_POST['conteudo']);
-    $id       = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $id       = isset($_POST['id']) ? intval($_POST['id']) : 0; //verifica se foi enviado um id, se foi, converte pra número inteiro, se não, atribui 0, o id é usado pra saber se é pra editar ou criar um novo artigo
 
-    if (!empty($titulo) && !empty($conteudo)) {
-        if ($id > 0) {
-            // Editar artigo
-            $stmt = $pdo->prepare("UPDATE artigos SET titulo = ?, autor = ?, conteudo = ? WHERE id = ?");
-            $stmt->execute([$titulo, $autor, $conteudo, $id]);
-        } else {
-            // Criar artigo
-            $stmt = $pdo->prepare("INSERT INTO artigos (titulo, autor, conteudo) VALUES (?, ?, ?)");
-            $stmt->execute([$titulo, $autor, $conteudo]);
+    if (!empty($titulo) && !empty($conteudo)) { // verifica se o título e o conteúdo não estão vazios
+        if ($id > 0) { // se o id for maior que 0, significa que é pra editar um artigo, se for 0, é pra criar um novo artigo
+            
+            $stmt = $pdo->prepare("UPDATE artigos SET titulo = ?, autor = ?, conteudo = ? WHERE id = ?"); // prepara comando sql para modificar um artigo, usando o id para identificar qual é o artigo
+            $stmt->execute([$titulo, $autor, $conteudo, $id]); // executa o comando e envia os dados pra substituir os pontinhos de interrogação
+        } else { // se o id for 0, é pra criar um artigo
+            
+            $stmt = $pdo->prepare("INSERT INTO artigos (titulo, autor, conteudo) VALUES (?, ?, ?)"); // merma coisa do anterior, mas pra criar um artigo
+            $stmt->execute([$titulo, $autor, $conteudo]); //merma coisa pt 2
         }
     }
-    header('Location: artigos.php'); exit;
+    header('Location: artigos.php'); exit; // se estiverem vazios ele joga pra página de artigos sem salvar 
 }
 
-// Deletar 
-if ($action === 'delete' && isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    $stmt = $pdo->prepare("DELETE FROM artigos WHERE id = ?");
-    $stmt->execute([$id]);
-    header('Location: artigos.php'); exit;
+if ($action === 'delete' && isset($_GET['id'])) { // se a pessoa clicar pra deletar, o action é delete e o id é enviado via get
+    $id = intval($_GET['id']); // transforma o id em número inteiro
+    $stmt = $pdo->prepare("DELETE FROM artigos WHERE id = ?"); // prepara o comando sql pra deletar um artigo
+    $stmt->execute([$id]); // executa o comando
+    header('Location: artigos.php'); exit; // manda pra página de artigos
 }
 
-// Busca de dados
 $artigo_editar = null;
 if ($action === 'edit' && isset($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -45,7 +44,6 @@ if ($action === 'edit' && isset($_GET['id'])) {
     $artigo_editar = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Busca os artigos cadastrados 
 $stmt_lista = $pdo->query("SELECT * FROM artigos ORDER BY id DESC");
 $artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
 ?>
