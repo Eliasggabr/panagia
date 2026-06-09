@@ -15,7 +15,7 @@ include 'includes/header.php';
         ?>
             <p class="text-stone-500 italic col-span-2">Nenhum santo cadastrado ainda.</p>
         <?php else: ?>
-            <?php foreach($santos as $santo): ?> // para cada santo cadastrado, mostra o nome do santo, a data da festa e a biografia do santo
+            <?php foreach($santos as $santo): ?> <!--para cada santo cadastrado, mostra o nome do santo, a data da festa e a biografia do santo-->
                 <div class="bg-white p-6 rounded shadow border border-stone-200 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">

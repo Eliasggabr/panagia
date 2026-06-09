@@ -67,7 +67,7 @@ $santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do comand
                 <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center w-full sm:w-auto">
                     Voltar ao Painel
                 </a>
-                <?php if ($action === 'list'): ?> // se a ação for list, mostra o botão de criar novo santo
+                <?php if ($action === 'list'): ?> <!-- se a ação for list, mostra o botão de criar novo santo -->
                     <a href="santos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center w-full sm:w-auto">
                         Novo Santo
                     </a>
@@ -75,7 +75,7 @@ $santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do comand
             </div>
         </div>
 
-        <?php if ($action === 'create' || $action === 'edit'): ?> // se a ação for criar ou editar, mostra o formulário de criação/edição
+        <?php if ($action === 'create' || $action === 'edit'): ?> <!-- se a ação for criar ou editar, mostra o formulário de criação/edição -->
             <form action="santos.php?action=save" method="POST" class="space-y-5">
                 <input type="hidden" name="id" value="<?= $santo_editar ? $santo_editar['id'] : '' ?>">
 
@@ -111,7 +111,7 @@ $santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do comand
                 </div>
             </form>
 
-        <?php else: ?> // se a ação não for criar e nem editar, mostra a lista de santos com as opções de editar ou excluir
+        <?php else: ?> <!-- se a ação não for criar e nem editar, mostra a lista de santos com as opções de editar ou excluir -->
             <div class="overflow-x-auto rounded-lg border border-amber-900/10">
                 <table class="w-full text-left border-collapse bg-stone-50/40">
                     <thead>
@@ -122,12 +122,12 @@ $santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do comand
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-200/80">
-                        <?php if (empty($santos)): ?> // se não tiver santos cadastrados, mostra a mensagem de q n tem nenhum santo registrado ainda
+                        <?php if (empty($santos)): ?> <!-- se não tiver santos cadastrados, mostra a mensagem de q n tem nenhum santo registrado ainda -->
                             <tr>
                                 <td colspan="3" class="p-4 text-center text-stone-500 font-serif italic">Nenhum santo registrado no momento.</td>
                             </tr>
-                        <?php else: ?> // se tiver, mostra a lista dos santos com suas opções (editar/excluir)
-                            <?php foreach ($santos as $snt): ?> // percorre a lista de santos e a mostra com as opções de editar ou excluir
+                        <?php else: ?> <!-- se tiver, mostra a lista dos santos com suas opções (editar/excluir) -->
+                            <?php foreach ($santos as $snt): ?> <!-- percorre a lista de santos e a mostra com as opções de editar ou excluir -->
                                 <tr class="hover:bg-amber-50/20 transition">
                                     <td class="p-4 font-serif font-medium text-amber-950"><?= htmlspecialchars($snt['nome']) ?></td>
                                     <td class="p-4 text-amber-900 text-sm font-medium"><?= htmlspecialchars($snt['dia_festa']) ?></td>

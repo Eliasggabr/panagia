@@ -69,7 +69,7 @@ $oracoes = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do coman
                 <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center w-full sm:w-auto">
                     Voltar ao Painel
                 </a>
-                <?php if ($action === 'list'): ?> // se a ação for list, mostra o botão de criar nova oração
+                <?php if ($action === 'list'): ?> <!-- se a ação for list, mostra o botão de criar nova oração -->
                     <a href="oracoes.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center w-full sm:w-auto">
                         Nova Oração
                     </a>
@@ -77,7 +77,7 @@ $oracoes = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do coman
             </div>
         </div>
 
-        <?php if ($action === 'create' || $action === 'edit'): ?> // se a ação for criar ou editar, mostra o formulário de criação/edição da oração
+        <?php if ($action === 'create' || $action === 'edit'): ?> <!-- se a ação for criar ou editar, mostra o formulário de criação/edição da oração -->
             <form action="oracoes.php?action=save" method="POST" class="space-y-5">
                 <input type="hidden" name="id" value="<?= $oracao_editar ? $oracao_editar['id'] : '' ?>">
 
@@ -113,7 +113,7 @@ $oracoes = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do coman
                 </div>
             </form>
 
-        <?php else: ?> // se a ação não for criar e nem editar, mostra a lista de orações com as opções de editar ou excluir
+        <?php else: ?> <!-- se a ação não for criar e nem editar, mostra a lista de orações com as opções de editar ou excluir -->
             <div class="overflow-x-auto rounded-lg border border-amber-900/10">
                 <table class="w-full text-left border-collapse bg-stone-50/40">
                     <thead>
@@ -124,20 +124,20 @@ $oracoes = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do coman
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-200/80">
-                        <?php if (empty($oracoes)): ?> // se não tiver orações cadastradas, mostra a mensagem de que n tem nenhuma oração registrada no livro
+                        <?php if (empty($oracoes)): ?> <!-- se não tiver orações cadastradas, mostra a mensagem de que n tem nenhuma oração registrada no livro -->
                             <tr>
                                 <td colspan="3" class="p-4 text-center text-stone-500 font-serif italic">Nenhuma prece registrada no livro.</td>
                             </tr>
-                        <?php else: ?> // se tiver, mostra a lista das orações com suas opções (editar/excluir)
-                            <?php foreach ($oracoes as $orc): ?> // percorre a lista de orações e a mostra com as opções de editar ou excluir
+                        <?php else: ?> <!-- se tiver, mostra a lista das orações com suas opções (editar/excluir) -->
+                            <?php foreach ($oracoes as $orc): ?> <!-- percorre a lista de orações e a mostra com as opções de editar ou excluir -->
                                 <tr class="hover:bg-amber-50/20 transition">
                                     <td class="p-4 font-serif font-medium text-amber-950"><?= htmlspecialchars($orc['titulo']) ?></td>
                                     <td class="p-4 text-stone-600 text-sm">
-                                        <?php if (!empty($orc['categoria'])): ?> // se a oração tiver categoria, mostra a categoria 
+                                        <?php if (!empty($orc['categoria'])): ?> <!-- se a oração tiver categoria, mostra a categoria -->
                                             <span class="bg-amber-900/10 text-amber-950 px-2 py-1 rounded text-xs font-semibold">
                                                 <?= htmlspecialchars($orc['categoria']) ?>
                                             </span>
-                                        <?php else: ?> // se n tiver categoria, diz que não tem categorias
+                                        <?php else: ?> <!-- se n tiver categoria, diz que não tem categorias -->
                                             <span class="text-stone-400 italic text-xs">Sem categoria</span>
                                         <?php endif; ?>
                                     </td>

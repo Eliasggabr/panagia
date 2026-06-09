@@ -68,15 +68,15 @@ $artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // transforma o resultado em
                 <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center w-full sm:w-auto">
                     Voltar ao Painel
                 </a>
-                <?php if ($action === 'list'): ?> // verifica se a ação é listar e abre um código HTML (:) para mostrar o botão de criar um novo artigo
+                <?php if ($action === 'list'): ?> <!-- verifica se a ação é listar e abre um código HTML (:) para mostrar o botão de criar um novo artigo -->
                     <a href="artigos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center w-full sm:w-auto">
                         Novo Artigo
                     </a>
-                <?php endif; ?> //fecha o código HTML
+                <?php endif; ?> <!-- fecha o código HTML -->
             </div>
         </div>
 
-        <?php if ($action === 'create' || $action === 'edit'): ?> // se a ação for criar ou editar, mostra o formulário de criação/edição 
+        <?php if ($action === 'create' || $action === 'edit'): ?> <!-- se a ação for criar ou editar, mostra o formulário de criação/edição -->
             <form action="artigos.php?action=save" method="POST" class="space-y-5">
                 <input type="hidden" name="id" value="<?= $artigo_editar ? $artigo_editar['id'] : '' ?>">
 
@@ -112,7 +112,7 @@ $artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // transforma o resultado em
                 </div>
             </form>
 
-        <?php else: ?> // se a ação não for criar nem editar, mostra a lista de artigos com as opções de editar ou excluir cada um
+        <?php else: ?> <!-- se a ação não for criar nem editar, mostra a lista de artigos com as opções de editar ou excluir cada um -->
             <div class="overflow-x-auto rounded-lg border border-amber-900/10">
                 <table class="w-full text-left border-collapse bg-stone-50/40">
                     <thead>
@@ -123,11 +123,11 @@ $artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // transforma o resultado em
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-200/80">
-                        <?php if (empty($artigos)): ?> // verifica se tem artigos, se não tiver, diz que nenhum artigo foi publicado no momento
+                        <?php if (empty($artigos)): ?> <!-- verifica se tem artigos, se não tiver, diz que nenhum artigo foi publicado no momento -->
                             <tr>
                                 <td colspan="3" class="p-4 text-center text-stone-500 font-serif italic">Nenhum artigo publicado no momento.</td>
                             </tr>
-                        <?php else: ?> // se tiver, mostra cada um em uma linha da tabela, com as opções de editar ou excluir
+                        <?php else: ?> <!-- se tiver, mostra cada um em uma linha da tabela, com as opções de editar ou excluir -->
                             <?php foreach ($artigos as $art): ?>
                                 <tr class="hover:bg-amber-50/20 transition">
                                     <td class="p-4 font-serif font-medium text-amber-950"><?= htmlspecialchars($art['titulo']) ?></td>

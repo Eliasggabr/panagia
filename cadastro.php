@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // se o método for post, processa 
     <div class="bg-white p-8 rounded-lg shadow border w-full max-w-md">
         <h2 class="text-2xl font-serif font-bold text-amber-800 text-center mb-6">Criar Conta no Panagia</h2>
         
-        <?php if($msg): ?> // mostra uma mensagem, se tiver alguma pra mostrar (se a conta foi criada com sucesso ou se ocorreu um erro)
+        <?php if($msg): ?> <!--mostra uma mensagem, se tiver alguma pra mostrar (se a conta foi criada com sucesso ou se ocorreu um erro)-->
             <div class="<?= $sucesso ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' ?> p-2 rounded mb-4 text-sm text-center"><?= $msg ?></div> 
         <?php endif; ?>
 

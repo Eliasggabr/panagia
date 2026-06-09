@@ -14,8 +14,8 @@ include 'includes/header.php';
         if (count($artigos) === 0): // se não tiver nenhum artigo, mostra uma mensagem dizendo que não tem artigos
         ?>
             <p class="text-stone-500 italic">Nenhum artigo publicado ainda.</p>
-        <?php else: ?> // se tiver artigos, mostra os artigos em uma lista com: título, data de criação, autor e o conteúdo do artigo
-            <?php foreach($artigos as $art): ?> // para cada artigo, mostra o título, a data de criação, o autor e o conteúdo do artigo
+        <?php else: ?> <!--se tiver artigos, mostra os artigos em uma lista com: título, data de criação, autor e o conteúdo do artigo-->
+            <?php foreach($artigos as $art): ?> <!--para cada artigo, mostra o título, a data de criação, o autor e o conteúdo do artigo-->
                 <article class="bg-white p-6 rounded shadow border border-stone-200">
                     <h2 class="text-2xl font-serif font-bold text-amber-900 mb-1"><?= htmlspecialchars($art['titulo']) ?></h2>
                     <div class="text-xs text-stone-400 mb-4">

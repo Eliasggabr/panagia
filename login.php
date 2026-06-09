@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // se o método for post, processa 
 <body class="bg-stone-100 flex items-center justify-center h-screen">
     <div class="bg-white p-8 rounded-lg shadow border w-full max-w-md">
         <h2 class="text-2xl font-serif font-bold text-amber-800 text-center mb-6">Acesso ao Portal</h2>
-        <?php if($erro): ?> <div class="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm text-center"><?= $erro ?></div> <?php endif; ?> // se tiver uma mensagem de erro, mostra a mensagem
+        <?php if($erro): ?> <div class="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm text-center"><?= $erro ?></div> <?php endif; ?> <!-- se tiver uma mensagem de erro, mostra a mensagem -->
         <form method="POST" class="space-y-4">
             <div>
                 <label class="block text-sm font-bold text-stone-700">E-mail</label>

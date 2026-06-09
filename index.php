@@ -22,7 +22,7 @@ include 'includes/header.php';
         
         <div class="bg-white p-6 rounded shadow border border-stone-200">
             <h2 class="text-xl font-serif font-bold text-amber-900 border-b border-stone-100 pb-2 mb-4">Últimos Artigos</h2>
-            <?php foreach($pdo->query("SELECT * FROM artigos ORDER BY id DESC LIMIT 3") as $a): ?> // seleciona os 3 artigos mais recentes do banco de dados e mostra o título e o autor de cada artigo, com um link para a página de artigos
+            <?php foreach($pdo->query("SELECT * FROM artigos ORDER BY id DESC LIMIT 3") as $a): ?> <!--seleciona os 3 artigos mais recentes do banco de dados e mostra o título e o autor de cada artigo, com um link para a página de artigos-->
                 <div class="mb-3">
                     <a href="artigos.php" class="font-bold text-stone-800 hover:text-amber-800 hover:underline block transition"><?= htmlspecialchars($a['titulo']) ?></a>
                     <span class="text-xs text-stone-400">Por: <?= htmlspecialchars($a['autor']) ?></span>
@@ -32,7 +32,7 @@ include 'includes/header.php';
         
         <div class="bg-white p-6 rounded shadow border border-stone-200">
             <h2 class="text-xl font-serif font-bold text-amber-900 border-b border-stone-100 pb-2 mb-4">Santos Celebrados</h2>
-            <?php foreach($pdo->query("SELECT * FROM santos ORDER BY id DESC LIMIT 3") as $s): ?> // seleciona os 3 santos mais recentes do banco de dados e mostra o nome e a data da festa de cada santo, com um link para a página de santos
+            <?php foreach($pdo->query("SELECT * FROM santos ORDER BY id DESC LIMIT 3") as $s): ?> <!--seleciona os 3 santos mais recentes do banco de dados e mostra o nome e a data da festa de cada santo, com um link para a página de santos-->
                 <div class="mb-3">
                     <a href="santos.php" class="font-bold text-stone-800 hover:text-amber-800 hover:underline block transition"><?= htmlspecialchars($s['nome']) ?></a>
                     <span class="bg-amber-100 text-amber-900 text-xs px-2 py-0.5 rounded font-medium inline-block mt-1">Festa: <?= htmlspecialchars($s['dia_festa']) ?></span>
@@ -42,7 +42,7 @@ include 'includes/header.php';
 
         <div class="bg-white p-6 rounded shadow border border-stone-200">
             <h2 class="text-xl font-serif font-bold text-amber-900 border-b border-stone-100 pb-2 mb-4">Espaço de orações</h2>
-            <?php foreach($pdo->query("SELECT * FROM oracoes ORDER BY id DESC LIMIT 3") as $o): ?> // seleciona as 3 orações mais recentes do banco de dados e mostra o título e a categoria de cada oração, com um link para a página de orações
+            <?php foreach($pdo->query("SELECT * FROM oracoes ORDER BY id DESC LIMIT 3") as $o): ?> <!--seleciona as 3 orações mais recentes do banco de dados e mostra o título e a categoria de cada oração, com um link para a página de orações-->
                 <div class="mb-3">
                     <a href="oracoes.php" class="font-bold text-stone-800 hover:text-amber-800 hover:underline block italic transition">"<?= htmlspecialchars($o['titulo']) ?>"</a>
                     <span class="text-xs text-stone-500">Seção: <?= htmlspecialchars($o['categoria']) ?></span>
