@@ -37,15 +37,15 @@ if ($action === 'delete' && isset($_GET['id'])) { // se a pessoa clicar pra dele
 }
 
 $artigo_editar = null;
-if ($action === 'edit' && isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    $stmt = $pdo->prepare("SELECT * FROM artigos WHERE id = ?");
-    $stmt->execute([$id]);
-    $artigo_editar = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($action === 'edit' && isset($_GET['id'])) { // se a ação for editar e existir o id
+    $id = intval($_GET['id']); // armazena o id transformado em número inteiro
+    $stmt = $pdo->prepare("SELECT * FROM artigos WHERE id = ?"); // prepara o comando sql pra selecionar o artigo que tem o id enviado
+    $stmt->execute([$id]); //executa o comando de busca do artigo
+    $artigo_editar = $stmt->fetch(PDO::FETCH_ASSOC); // pega só uma linha (artigo) do banco 
 }
 
-$stmt_lista = $pdo->query("SELECT * FROM artigos ORDER BY id DESC");
-$artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
+$stmt_lista = $pdo->query("SELECT * FROM artigos ORDER BY id DESC"); // pega os artigos do mais novo para o o mais velho para listar
+$artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // transforma o resultado em uma lista (pega todas as linhas)
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -68,15 +68,15 @@ $artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
                 <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center w-full sm:w-auto">
                     Voltar ao Painel
                 </a>
-                <?php if ($action === 'list'): ?>
+                <?php if ($action === 'list'): ?> // verifica se a ação é listar e abre um código HTML (:) para mostrar o botão de criar um novo artigo
                     <a href="artigos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center w-full sm:w-auto">
                         Novo Artigo
                     </a>
-                <?php endif; ?>
+                <?php endif; ?> //fecha o código HTML
             </div>
         </div>
 
-        <?php if ($action === 'create' || $action === 'edit'): ?>
+        <?php if ($action === 'create' || $action === 'edit'): ?> // se a ação for criar ou editar, mostra o formulário de criação/edição 
             <form action="artigos.php?action=save" method="POST" class="space-y-5">
                 <input type="hidden" name="id" value="<?= $artigo_editar ? $artigo_editar['id'] : '' ?>">
 
@@ -112,7 +112,7 @@ $artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </form>
 
-        <?php else: ?>
+        <?php else: ?> // se a ação não for criar nem editar, mostra a lista de artigos com as opções de editar ou excluir cada um
             <div class="overflow-x-auto rounded-lg border border-amber-900/10">
                 <table class="w-full text-left border-collapse bg-stone-50/40">
                     <thead>
@@ -123,11 +123,11 @@ $artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-200/80">
-                        <?php if (empty($artigos)): ?>
+                        <?php if (empty($artigos)): ?> // verifica se tem artigos, se não tiver, diz que nenhum artigo foi publicado no momento
                             <tr>
                                 <td colspan="3" class="p-4 text-center text-stone-500 font-serif italic">Nenhum artigo publicado no momento.</td>
                             </tr>
-                        <?php else: ?>
+                        <?php else: ?> // se tiver, mostra cada um em uma linha da tabela, com as opções de editar ou excluir
                             <?php foreach ($artigos as $art): ?>
                                 <tr class="hover:bg-amber-50/20 transition">
                                     <td class="p-4 font-serif font-medium text-amber-950"><?= htmlspecialchars($art['titulo']) ?></td>

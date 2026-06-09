@@ -1,50 +1,50 @@
 <?php 
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') {
+if (session_status() === PHP_SESSION_NONE) { session_start(); } // começa a sessão se não tiver sido iniciada
+if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') { // se não estiver logado ou n for admin, é mandado pra login.php
     header('Location: ../login.php'); exit;
 }
 require_once '../config/conexao.php';
 
-$action = isset($_GET['action']) ? $_GET['action'] : 'list';
+$action = isset($_GET['action']) ? $_GET['action'] : 'list'; // pega a ação da URL, se não tiver, é list
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') { // se o método for post e a ação for salvar, executa a criação ou edição dos santos
     $nome      = trim($_POST['nome']);
     $dia_festa = trim($_POST['dia_festa']);
     $biografia = trim($_POST['biografia']);
     $id        = isset($_POST['id']) ? intval($_POST['id']) : 0;
 
-    if (!empty($nome) && !empty($biografia)) {
-        if ($id > 0) {
+    if (!empty($nome) && !empty($biografia)) { // se o nome e a biografia não estiverem vazios, executa a criação ou edição do santo
+        if ($id > 0) { // se o id for maior que 0, é edição, se for 0, é criação
             
-            $stmt = $pdo->prepare("UPDATE santos SET nome = ?, dia_festa = ?, biografia = ? WHERE id = ?");
-            $stmt->execute([$nome, $dia_festa, $biografia, $id]);
+            $stmt = $pdo->prepare("UPDATE santos SET nome = ?, dia_festa = ?, biografia = ? WHERE id = ?"); // prepara o comando sql de editar
+            $stmt->execute([$nome, $dia_festa, $biografia, $id]); // executa o comando
         } else {
             
-            $stmt = $pdo->prepare("INSERT INTO santos (nome, dia_festa, biografia) VALUES (?, ?, ?)");
-            $stmt->execute([$nome, $dia_festa, $biografia]);
+            $stmt = $pdo->prepare("INSERT INTO santos (nome, dia_festa, biografia) VALUES (?, ?, ?)"); // prepara o comando sql de criar
+            $stmt->execute([$nome, $dia_festa, $biografia]); // executa o comando
         }
     }
-    header('Location: santos.php'); exit;
+    header('Location: santos.php'); exit; // depois de salvar, manda pra santos.php
 }
 
-if ($action === 'delete' && isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    $stmt = $pdo->prepare("DELETE FROM santos WHERE id = ?");
-    $stmt->execute([$id]);
-    header('Location: santos.php'); exit;
+if ($action === 'delete' && isset($_GET['id'])) { // se a ação for delete e tiver o id na URL, executa a exclusão do santo
+    $id = intval($_GET['id']); // armazena o id como número inteiro 
+    $stmt = $pdo->prepare("DELETE FROM santos WHERE id = ?"); // prepara o comando sql de deletar 
+    $stmt->execute([$id]); // executa 
+    header('Location: santos.php'); exit; // depois de excluir, manda para santos.php
 }
 
 $santo_editar = null;
-if ($action === 'edit' && isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    $stmt = $pdo->prepare("SELECT * FROM santos WHERE id = ?");
-    $stmt->execute([$id]);
-    $santo_editar = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($action === 'edit' && isset($_GET['id'])) { // se a ação for edit e tiver o id na URL, busca os dados do santo
+    $id = intval($_GET['id']); // armazena o id como número inteiro
+    $stmt = $pdo->prepare("SELECT * FROM santos WHERE id = ?"); // prepara o comando sql de selecionar o santo pelo id
+    $stmt->execute([$id]); // executa o comando
+    $santo_editar = $stmt->fetch(PDO::FETCH_ASSOC); // armazena os dados do santo em uma lista 
 }
 
-$stmt_lista = $pdo->query("SELECT * FROM santos ORDER BY id DESC");
-$santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
+$stmt_lista = $pdo->query("SELECT * FROM santos ORDER BY id DESC"); // prepara o comando sql de selecionar todos os santos pelo id do mais recente para o mais antigo
+$santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do comando e armazena em uma lista
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -67,7 +67,7 @@ $santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
                 <a href="index.php" class="border border-amber-900/30 text-amber-950 px-4 py-2 rounded font-medium text-sm hover:bg-stone-50 transition text-center w-full sm:w-auto">
                     Voltar ao Painel
                 </a>
-                <?php if ($action === 'list'): ?>
+                <?php if ($action === 'list'): ?> // se a ação for list, mostra o botão de criar novo santo
                     <a href="santos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center w-full sm:w-auto">
                         Novo Santo
                     </a>
@@ -75,7 +75,7 @@ $santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
 
-        <?php if ($action === 'create' || $action === 'edit'): ?>
+        <?php if ($action === 'create' || $action === 'edit'): ?> // se a ação for criar ou editar, mostra o formulário de criação/edição
             <form action="santos.php?action=save" method="POST" class="space-y-5">
                 <input type="hidden" name="id" value="<?= $santo_editar ? $santo_editar['id'] : '' ?>">
 
@@ -111,7 +111,7 @@ $santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </form>
 
-        <?php else: ?>
+        <?php else: ?> // se a ação não for criar e nem editar, mostra a lista de santos com as opções de editar ou excluir
             <div class="overflow-x-auto rounded-lg border border-amber-900/10">
                 <table class="w-full text-left border-collapse bg-stone-50/40">
                     <thead>
@@ -122,12 +122,12 @@ $santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-200/80">
-                        <?php if (empty($santos)): ?>
+                        <?php if (empty($santos)): ?> // se não tiver santos cadastrados, mostra a mensagem de q n tem nenhum santo registrado ainda
                             <tr>
                                 <td colspan="3" class="p-4 text-center text-stone-500 font-serif italic">Nenhum santo registrado no momento.</td>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($santos as $snt): ?>
+                        <?php else: ?> // se tiver, mostra a lista dos santos com suas opções (editar/excluir)
+                            <?php foreach ($santos as $snt): ?> // percorre a lista de santos e a mostra com as opções de editar ou excluir
                                 <tr class="hover:bg-amber-50/20 transition">
                                     <td class="p-4 font-serif font-medium text-amber-950"><?= htmlspecialchars($snt['nome']) ?></td>
                                     <td class="p-4 text-amber-900 text-sm font-medium"><?= htmlspecialchars($snt['dia_festa']) ?></td>

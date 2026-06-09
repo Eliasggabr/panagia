@@ -8,14 +8,14 @@ include 'includes/header.php';
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <?php 
-        $stmt = $pdo->query("SELECT * FROM santos ORDER BY nome ASC");
-        $santos = $stmt->fetchAll();
+        $stmt = $pdo->query("SELECT * FROM santos ORDER BY nome ASC"); // seleciona todos os santos do banco de dasos, ordenando por nome em ordem alfabética
+        $santos = $stmt->fetchAll(); // pega todos os santos e guarda na variável $santos, que vai conter os dados de cada santo, como nome, dia da festa e biografia
 
-        if (count($santos) === 0): 
+        if (count($santos) === 0): // se não tiver santos cadastrados, mostra uma mensagem dizendo que não tem santos
         ?>
             <p class="text-stone-500 italic col-span-2">Nenhum santo cadastrado ainda.</p>
         <?php else: ?>
-            <?php foreach($santos as $santo): ?>
+            <?php foreach($santos as $santo): ?> // para cada santo cadastrado, mostra o nome do santo, a data da festa e a biografia do santo
                 <div class="bg-white p-6 rounded shadow border border-stone-200 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-start mb-2">

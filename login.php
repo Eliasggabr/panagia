@@ -3,27 +3,27 @@ session_start();
 require_once 'config/conexao.php';
 $erro = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { // se o método for post, processa os dados do formulário de login
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL); // filtra o email
     $senha = $_POST['senha'];
 
-    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?"); // prepara o comando sql para selecionar o usuário pelo email
+    $stmt->execute([$email]); // executa o comando
+    $user = $stmt->fetch(); // pega o resultado da consulta e guarda na variável $user, que vai conter os dados do usuário se ele existir
     
-    if ($user && password_verify($senha, $user['senha'])) {
+    if ($user && password_verify($senha, $user['senha'])) { // se o usuário existir e a senha for correta, cria a sessão e redireciona para a página correspondente ao tipo do usuário (admin ou leitor)
         $_SESSION['logado'] = true;
         $_SESSION['id'] = $user['id'];
         $_SESSION['nome'] = $user['nome'];
         $_SESSION['tipo'] = $user['tipo'];
 
-        if ($user['tipo'] === 'admin') {
+        if ($user['tipo'] === 'admin') { // verifica se o tipo do usuário é admin, e redireciona para a página de administração
             header('Location: admin/index.php');
-        } else {
+        } else { // se não for admin, redireciona para a página inicial do site
             header('Location: index.php');
         }
         exit;
-    } else {
+    } else { // se não existir o usuário ou a senha for incorreta, mostra uma mensagem de erro
         $erro = "E-mail ou senha incorretos.";
     }
 }
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-stone-100 flex items-center justify-center h-screen">
     <div class="bg-white p-8 rounded-lg shadow border w-full max-w-md">
         <h2 class="text-2xl font-serif font-bold text-amber-800 text-center mb-6">Acesso ao Portal</h2>
-        <?php if($erro): ?> <div class="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm text-center"><?= $erro ?></div> <?php endif; ?>
+        <?php if($erro): ?> <div class="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm text-center"><?= $erro ?></div> <?php endif; ?> // se tiver uma mensagem de erro, mostra a mensagem
         <form method="POST" class="space-y-4">
             <div>
                 <label class="block text-sm font-bold text-stone-700">E-mail</label>

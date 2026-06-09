@@ -16,15 +16,15 @@
                 <a href="/santos.php" class="hover:text-amber-200 text-sm md:text-base transition">Santos</a>
                 <a href="/oracoes.php" class="hover:text-amber-200 text-sm md:text-base transition">Orações</a>
                 
-                <?php if (isset($_SESSION['logado'])): ?>
-                    <?php if ($_SESSION['tipo'] === 'admin'): ?>
+                <?php if (isset($_SESSION['logado'])): ?> // se o usuário estiver logado, mostra o nome dele e a opção de sair
+                    <?php if ($_SESSION['tipo'] === 'admin'): ?> // se o usuário for admin, mostra o link para o painel admin
                         <a href="/admin/index.php" class="bg-amber-700 px-4 py-2 rounded text-sm font-semibold text-white hover:bg-amber-600 shadow-sm transition">Painel Admin</a>
                     <?php endif; ?>
                     
                     <span class="text-sm md:text-base text-white font-sans font-bold tracking-wide">Olá, <?= htmlspecialchars($_SESSION['nome']) ?></span>
                     
                     <a href="/logout.php" class="text-sm md:text-base bg-red-800 px-3 py-1.5 rounded font-medium text-white hover:bg-red-700 shadow-sm transition">Sair</a>
-                <?php else: ?>
+                <?php else: ?> // se n tiver logado, mostra a opção de entrar
                     <a href="/login.php" class="text-sm border border-amber-400 px-3 py-1 rounded text-amber-100 hover:bg-stone-900 transition">Entrar</a>
                 <?php endif; ?>
             </div>
