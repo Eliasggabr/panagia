@@ -1,51 +1,50 @@
 <?php 
-if (session_status() === PHP_SESSION_NONE) { session_start(); } // inicia a sessão se ainda não tiver sido iniciada
-if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') { // se não tiver logado ou n for admin, é mandado pra login.php
-    header('Location: ../login.php'); exit;
+if (session_status() === PHP_SESSION_NONE) { session_start(); } 
+if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') { 
 }
 require_once '../config/conexao.php';
 
-$action = isset($_GET['action']) ? $_GET['action'] : 'list'; // pega a ação da URL, se não tiver, é list (mostrar a lista de orações)
+$action = isset($_GET['action']) ? $_GET['action'] : 'list'; 
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') { // se o método for post e a ação for save, executa a criação ou edição
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') { 
     $titulo    = trim($_POST['titulo']);
     $categoria = trim($_POST['categoria']);
     $texto     = trim($_POST['texto']);
     $id        = isset($_POST['id']) ? intval($_POST['id']) : 0;
 
-    if (!empty($titulo) && !empty($texto)) { // se o título e o texto n estiverem vazios, executa a criação ou edição
-        if ($id > 0) { // se o id for 0, executa a edição
+    if (!empty($titulo) && !empty($texto)) { 
+        if ($id > 0) { 
 
-            $stmt = $pdo->prepare("UPDATE oracoes SET titulo = ?, categoria = ?, texto = ? WHERE id = ?"); // prepara o comando sql de atualizar a oração pelo id
-            $stmt->execute([$titulo, $categoria, $texto, $id]); // executa o comando passando os dados do formulário e o id da oração q vai ser editada
+            $stmt = $pdo->prepare("UPDATE oracoes SET titulo = ?, categoria = ?, texto = ? WHERE id = ?"); 
+            $stmt->execute([$titulo, $categoria, $texto, $id]); 
         } else { // se o id for 0, executa a criação
             
-            $stmt = $pdo->prepare("INSERT INTO oracoes (titulo, categoria, texto) VALUES (?, ?, ?)"); // prepara o comando sql de criar a oração
-            $stmt->execute([$titulo, $categoria, $texto]); // executa o comando passando os dados do formulário para criar a nova oração
+            $stmt = $pdo->prepare("INSERT INTO oracoes (titulo, categoria, texto) VALUES (?, ?, ?)"); 
+            $stmt->execute([$titulo, $categoria, $texto]); 
         }
     }
-    header('Location: oracoes.php'); exit; // joga para oracoes.php
+    header('Location: oracoes.php'); exit; 
 }
 
 
-if ($action === 'delete' && isset($_GET['id'])) { // se a ação for delete e tiver o id na URL, executa a exclusão da oração
-    $id = intval($_GET['id']); // armazena o id como número inteiro
-    $stmt = $pdo->prepare("DELETE FROM oracoes WHERE id = ?"); // prepara o comando sql de deletar a oração pelo id
-    $stmt->execute([$id]); // executa o comando passando o id da oração que vai ser deletada
-    header('Location: oracoes.php'); exit; // joga para oracoes.php
+if ($action === 'delete' && isset($_GET['id'])) { 
+    $id = intval($_GET['id']); 
+    $stmt = $pdo->prepare("DELETE FROM oracoes WHERE id = ?"); 
+    $stmt->execute([$id]); 
+    header('Location: oracoes.php'); exit; 
 }
 
 
 $oracao_editar = null;
-if ($action === 'edit' && isset($_GET['id'])) { // se a ação for edit e tiver o id na URL, busca os dados da oração
+if ($action === 'edit' && isset($_GET['id'])) { 
     $id = intval($_GET['id']);
-    $stmt = $pdo->prepare("SELECT * FROM oracoes WHERE id = ?"); // prepara o comando sql de selecionar a oração pelo id
-    $stmt->execute([$id]); // executa o comando passando o id da oração que vai ser editada
-    $oracao_editar = $stmt->fetch(PDO::FETCH_ASSOC); // pega o resultado do comando e armazena em uma lista para mostrar os dados da oração no formulário de edição
+    $stmt = $pdo->prepare("SELECT * FROM oracoes WHERE id = ?"); 
+    $stmt->execute([$id]); 
+    $oracao_editar = $stmt->fetch(PDO::FETCH_ASSOC); // pega a oração que tem o id enviado para mostrar os dados dela no formulário de edição
 }
 
-$stmt_lista = $pdo->query("SELECT * FROM oracoes ORDER BY id DESC"); // prepara o comando sql de selecionar todas as orações da mais recente para a mais antiga
+$stmt_lista = $pdo->query("SELECT * FROM oracoes ORDER BY id DESC"); 
 $oracoes = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do comando e armazena em uma lista para mostrar as orações no espaço de orações
 ?>
 <!DOCTYPE html>

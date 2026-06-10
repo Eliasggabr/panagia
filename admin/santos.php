@@ -1,50 +1,50 @@
 <?php 
-if (session_status() === PHP_SESSION_NONE) { session_start(); } // começa a sessão se não tiver sido iniciada
-if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') { // se não estiver logado ou n for admin, é mandado pra login.php
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') {
     header('Location: ../login.php'); exit;
 }
 require_once '../config/conexao.php';
 
-$action = isset($_GET['action']) ? $_GET['action'] : 'list'; // pega a ação da URL, se não tiver, é list
+$action = isset($_GET['action']) ? $_GET['action'] : 'list'; 
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') { // se o método for post e a ação for salvar, executa a criação ou edição dos santos
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') { 
     $nome      = trim($_POST['nome']);
     $dia_festa = trim($_POST['dia_festa']);
     $biografia = trim($_POST['biografia']);
     $id        = isset($_POST['id']) ? intval($_POST['id']) : 0;
 
-    if (!empty($nome) && !empty($biografia)) { // se o nome e a biografia não estiverem vazios, executa a criação ou edição do santo
-        if ($id > 0) { // se o id for maior que 0, é edição, se for 0, é criação
+    if (!empty($nome) && !empty($biografia)) { 
+        if ($id > 0) { 
             
-            $stmt = $pdo->prepare("UPDATE santos SET nome = ?, dia_festa = ?, biografia = ? WHERE id = ?"); // prepara o comando sql de editar
-            $stmt->execute([$nome, $dia_festa, $biografia, $id]); // executa o comando
+            $stmt = $pdo->prepare("UPDATE santos SET nome = ?, dia_festa = ?, biografia = ? WHERE id = ?"); 
+            $stmt->execute([$nome, $dia_festa, $biografia, $id]); 
         } else {
             
-            $stmt = $pdo->prepare("INSERT INTO santos (nome, dia_festa, biografia) VALUES (?, ?, ?)"); // prepara o comando sql de criar
-            $stmt->execute([$nome, $dia_festa, $biografia]); // executa o comando
+            $stmt = $pdo->prepare("INSERT INTO santos (nome, dia_festa, biografia) VALUES (?, ?, ?)"); 
+            $stmt->execute([$nome, $dia_festa, $biografia]); 
         }
     }
-    header('Location: santos.php'); exit; // depois de salvar, manda pra santos.php
+    header('Location: santos.php'); exit; 
 }
 
-if ($action === 'delete' && isset($_GET['id'])) { // se a ação for delete e tiver o id na URL, executa a exclusão do santo
-    $id = intval($_GET['id']); // armazena o id como número inteiro 
-    $stmt = $pdo->prepare("DELETE FROM santos WHERE id = ?"); // prepara o comando sql de deletar 
+if ($action === 'delete' && isset($_GET['id'])) { 
+    $id = intval($_GET['id']);  
+    $stmt = $pdo->prepare("DELETE FROM santos WHERE id = ?");  
     $stmt->execute([$id]); // executa 
-    header('Location: santos.php'); exit; // depois de excluir, manda para santos.php
+    header('Location: santos.php'); exit; 
 }
 
 $santo_editar = null;
-if ($action === 'edit' && isset($_GET['id'])) { // se a ação for edit e tiver o id na URL, busca os dados do santo
-    $id = intval($_GET['id']); // armazena o id como número inteiro
-    $stmt = $pdo->prepare("SELECT * FROM santos WHERE id = ?"); // prepara o comando sql de selecionar o santo pelo id
-    $stmt->execute([$id]); // executa o comando
-    $santo_editar = $stmt->fetch(PDO::FETCH_ASSOC); // armazena os dados do santo em uma lista 
+if ($action === 'edit' && isset($_GET['id'])) { 
+    $id = intval($_GET['id']); 
+    $stmt = $pdo->prepare("SELECT * FROM santos WHERE id = ?"); 
+    $stmt->execute([$id]); 
+    $santo_editar = $stmt->fetch(PDO::FETCH_ASSOC); 
 }
 
-$stmt_lista = $pdo->query("SELECT * FROM santos ORDER BY id DESC"); // prepara o comando sql de selecionar todos os santos pelo id do mais recente para o mais antigo
-$santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // pega o resultado do comando e armazena em uma lista
+$stmt_lista = $pdo->query("SELECT * FROM santos ORDER BY id DESC"); 
+$santos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">

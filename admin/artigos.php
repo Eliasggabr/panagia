@@ -1,51 +1,49 @@
 <?php 
 if (session_status() === PHP_SESSION_NONE) { session_start(); } // verifica se a sessão já foi iniciada, se não, inicia a sessão
 
-if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') { // esse é o código porteiro, que verifica se o usuário está logado e se é do tipo admin, se não, te taca pra página de login
-    header('Location: ../login.php'); exit;
+if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') { 
 }
 require_once '../config/conexao.php'; // pega o pdo lá
 
-$action = isset($_GET['action']) ? $_GET['action'] : 'list'; // pega o action da url com o valor dela, se ela n tiver o valor, ela pega list pra listar os arquivos
+$action = isset($_GET['action']) ? $_GET['action'] : 'list'; 
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') { // verifica se o método é post e se o action é save, se for, ele salva ou edita o artigo
-    $titulo   = trim($_POST['titulo']); // pega os valores enviados do formulário, o trim é pra tirar os espaços em branco no começo e no final
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') { 
+    $titulo   = trim($_POST['titulo']); 
     $autor    = trim($_POST['autor']);
     $conteudo = trim($_POST['conteudo']);
-    $id       = isset($_POST['id']) ? intval($_POST['id']) : 0; //verifica se foi enviado um id, se foi, converte pra número inteiro, se não, atribui 0, o id é usado pra saber se é pra editar ou criar um novo artigo
+    $id       = isset($_POST['id']) ? intval($_POST['id']) : 0; 
 
-    if (!empty($titulo) && !empty($conteudo)) { // verifica se o título e o conteúdo não estão vazios
-        if ($id > 0) { // se o id for maior que 0, significa que é pra editar um artigo, se for 0, é pra criar um novo artigo
+    if (!empty($titulo) && !empty($conteudo)) { 
+        if ($id > 0) { 
             
             $stmt = $pdo->prepare("UPDATE artigos SET titulo = ?, autor = ?, conteudo = ? WHERE id = ?"); // prepara comando sql para modificar um artigo, usando o id para identificar qual é o artigo
-            $stmt->execute([$titulo, $autor, $conteudo, $id]); // executa o comando e envia os dados pra substituir os pontinhos de interrogação
-        } else { // se o id for 0, é pra criar um artigo
+            $stmt->execute([$titulo, $autor, $conteudo, $id]); 
             
-            $stmt = $pdo->prepare("INSERT INTO artigos (titulo, autor, conteudo) VALUES (?, ?, ?)"); // merma coisa do anterior, mas pra criar um artigo
-            $stmt->execute([$titulo, $autor, $conteudo]); //merma coisa pt 2
+            $stmt = $pdo->prepare("INSERT INTO artigos (titulo, autor, conteudo) VALUES (?, ?, ?)"); 
+            $stmt->execute([$titulo, $autor, $conteudo]); 
         }
     }
-    header('Location: artigos.php'); exit; // se estiverem vazios ele joga pra página de artigos sem salvar 
+    header('Location: artigos.php'); exit;
 }
 
-if ($action === 'delete' && isset($_GET['id'])) { // se a pessoa clicar pra deletar, o action é delete e o id é enviado via get
-    $id = intval($_GET['id']); // transforma o id em número inteiro
-    $stmt = $pdo->prepare("DELETE FROM artigos WHERE id = ?"); // prepara o comando sql pra deletar um artigo
-    $stmt->execute([$id]); // executa o comando
-    header('Location: artigos.php'); exit; // manda pra página de artigos
+if ($action === 'delete' && isset($_GET['id'])) { 
+    $id = intval($_GET['id']); 
+    $stmt = $pdo->prepare("DELETE FROM artigos WHERE id = ?"); 
+    $stmt->execute([$id]); 
+    header('Location: artigos.php'); exit; 
 }
 
 $artigo_editar = null;
-if ($action === 'edit' && isset($_GET['id'])) { // se a ação for editar e existir o id
-    $id = intval($_GET['id']); // armazena o id transformado em número inteiro
-    $stmt = $pdo->prepare("SELECT * FROM artigos WHERE id = ?"); // prepara o comando sql pra selecionar o artigo que tem o id enviado
-    $stmt->execute([$id]); //executa o comando de busca do artigo
-    $artigo_editar = $stmt->fetch(PDO::FETCH_ASSOC); // pega só uma linha (artigo) do banco 
+if ($action === 'edit' && isset($_GET['id'])) { 
+    $id = intval($_GET['id']); 
+    $stmt = $pdo->prepare("SELECT * FROM artigos WHERE id = ?"); 
+    $stmt->execute([$id]); 
+    $artigo_editar = $stmt->fetch(PDO::FETCH_ASSOC); 
 }
 
-$stmt_lista = $pdo->query("SELECT * FROM artigos ORDER BY id DESC"); // pega os artigos do mais novo para o o mais velho para listar
-$artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // transforma o resultado em uma lista (pega todas as linhas)
+$stmt_lista = $pdo->query("SELECT * FROM artigos ORDER BY id DESC"); 
+$artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -72,7 +70,7 @@ $artigos = $stmt_lista->fetchAll(PDO::FETCH_ASSOC); // transforma o resultado em
                     <a href="artigos.php?action=create" class="bg-[#030712] text-stone-100 px-4 py-2 rounded font-medium text-sm hover:bg-slate-900 transition shadow-sm text-center w-full sm:w-auto">
                         Novo Artigo
                     </a>
-                <?php endif; ?> <!-- fecha o código HTML -->
+                <?php endif; ?>
             </div>
         </div>
 

@@ -8,10 +8,10 @@ include 'includes/header.php';
     
     <div class="space-y-8">
         <?php 
-        $stmt = $pdo->query("SELECT * FROM oracoes ORDER BY categoria, titulo ASC"); // seleciona todas as orações do banco de dados, ordenando por categoria e depois por título
-        $oracoes = $stmt->fetchAll(); // pega todas as orações e guarda na variável $oracoes, que vai conter os dados de cada oração, como título, categoria e texto
+        $stmt = $pdo->query("SELECT * FROM oracoes ORDER BY categoria, titulo ASC"); 
+        $oracoes = $stmt->fetchAll(); 
 
-        if (count($oracoes) === 0): // se não tiver nenhuma oração, mostra uma mensagem dizendo que não tem orações
+        if (count($oracoes) === 0):
         ?>
             <p class="text-stone-500 italic text-center">Nenhuma oração cadastrada ainda.</p>
         <?php else: ?>

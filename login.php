@@ -3,12 +3,12 @@ session_start();
 require_once 'config/conexao.php';
 $erro = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') { // se o método for post, processa os dados do formulário de login
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL); // filtra o email
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL); 
     $senha = $_POST['senha'];
 
-    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?"); // prepara o comando sql para selecionar o usuário pelo email
-    $stmt->execute([$email]); // executa o comando
+    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?"); 
+    $stmt->execute([$email]);
     $user = $stmt->fetch(); // pega o resultado da consulta e guarda na variável $user, que vai conter os dados do usuário se ele existir
     
     if ($user && password_verify($senha, $user['senha'])) { // se o usuário existir e a senha for correta, cria a sessão e redireciona para a página correspondente ao tipo do usuário (admin ou leitor)
@@ -17,13 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // se o método for post, processa 
         $_SESSION['nome'] = $user['nome'];
         $_SESSION['tipo'] = $user['tipo'];
 
-        if ($user['tipo'] === 'admin') { // verifica se o tipo do usuário é admin, e redireciona para a página de administração
+        if ($user['tipo'] === 'admin') { 
             header('Location: admin/index.php');
-        } else { // se não for admin, redireciona para a página inicial do site
+        } else {
             header('Location: index.php');
         }
         exit;
-    } else { // se não existir o usuário ou a senha for incorreta, mostra uma mensagem de erro
+    } else { 
         $erro = "E-mail ou senha incorretos.";
     }
 }

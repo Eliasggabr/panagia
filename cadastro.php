@@ -3,23 +3,23 @@ require_once 'config/conexao.php';
 $msg = '';
 $sucesso = false;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') { // se o método for post, processa os dados do formulário
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = trim($_POST['nome']);
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL); // filtra o email pra evitar sql injection
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL); 
     $senha = $_POST['senha'];
 
-    if (!empty($nome) && !empty($email) && !empty($senha)) { // se tiver nome, email e senha preenchidos, cria a senha protegida e cria a conta
+    if (!empty($nome) && !empty($email) && !empty($senha)) { 
         $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, tipo) VALUES (?, ?, ?, 'leitor')"); // prepara o comando sql para inserir o usuário no banco de dados, com tipo 'leitor'
-            $stmt->execute([$nome, $email, $senha_hash]); // executa o comando sql, passando o nome, email e senha protegida como parâmetros
+            $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, tipo) VALUES (?, ?, ?, 'leitor')"); 
+            $stmt->execute([$nome, $email, $senha_hash]); 
             $msg = "Conta criada com sucesso! Faça seu login.";
             $sucesso = true;
-        } catch (\PDOException $e) { // se ocorrer um erro, verifica se é por causa do email já existir, e mostra a mensagem de erro correspondente
+        } catch (\PDOException $e) { 
             $msg = "Este e-mail já está cadastrado.";
         }
-    } else { // se faltar algum campo, mostra uma mensagem de erro pedindo para preencher todos os campos
+    } else { 
         $msg = "Preencha todos os campos.";
     }
 }
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // se o método for post, processa 
     <div class="bg-white p-8 rounded-lg shadow border w-full max-w-md">
         <h2 class="text-2xl font-serif font-bold text-amber-800 text-center mb-6">Criar Conta no Panagia</h2>
         
-        <?php if($msg): ?> <!--mostra uma mensagem, se tiver alguma pra mostrar (se a conta foi criada com sucesso ou se ocorreu um erro)-->
+        <?php if($msg): ?> 
             <div class="<?= $sucesso ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' ?> p-2 rounded mb-4 text-sm text-center"><?= $msg ?></div> 
         <?php endif; ?>
 
