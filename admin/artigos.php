@@ -2,6 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) { session_start(); } // verifica se a sessão já foi iniciada, se não, inicia a sessão
 
 if (!isset($_SESSION['logado']) || $_SESSION['tipo'] !== 'admin') { 
+    header('Location: ../login.php');
+    exit; 
 }
 require_once '../config/conexao.php'; // pega o pdo lá
 
@@ -16,9 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
 
     if (!empty($titulo) && !empty($conteudo)) { 
         if ($id > 0) { 
-            
-            $stmt = $pdo->prepare("UPDATE artigos SET titulo = ?, autor = ?, conteudo = ? WHERE id = ?"); // prepara comando sql para modificar um artigo, usando o id para identificar qual é o artigo
+    
+            $stmt = $pdo->prepare("UPDATE artigos SET titulo = ?, autor = ?, conteudo = ? WHERE id = ?");
             $stmt->execute([$titulo, $autor, $conteudo, $id]); 
+        } else { 
             
             $stmt = $pdo->prepare("INSERT INTO artigos (titulo, autor, conteudo) VALUES (?, ?, ?)"); 
             $stmt->execute([$titulo, $autor, $conteudo]); 
@@ -26,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'save') {
     }
     header('Location: artigos.php'); exit;
 }
-
 if ($action === 'delete' && isset($_GET['id'])) { 
     $id = intval($_GET['id']); 
     $stmt = $pdo->prepare("DELETE FROM artigos WHERE id = ?"); 
