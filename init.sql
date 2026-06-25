@@ -6,28 +6,34 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
-    tipo VARCHAR(20) NOT NULL DEFAULT 'leitor'
-);
+    tipo VARCHAR(20) NOT NULL DEFAULT 'leitor',
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS artigos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
     autor VARCHAR(100) NOT NULL DEFAULT 'admin',
-    conteudo TEXT NOT NULL
-);
+    conteudo TEXT NOT NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS oracoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
-    conteudo TEXT NOT NULL
-);
+    categoria VARCHAR(100) NOT NULL DEFAULT '',
+    texto TEXT NOT NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS santos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
-    biografia TEXT NOT NULL
-);
+    dia_festa VARCHAR(100) NOT NULL DEFAULT '',
+    biografia TEXT NOT NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO usuarios (nome, email, senha, tipo) 
+INSERT INTO usuarios (nome, email, senha, tipo)
 VALUES ('Admin - Elias', 'admin@panagia', 'EG13062009TY456', 'admin')
-ON DUPLICATE KEY UPDATE tipo='admin';
+ON DUPLICATE KEY UPDATE tipo = 'admin';

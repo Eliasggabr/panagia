@@ -3,7 +3,7 @@ session_start();
 require_once 'config/conexao.php';
 $erro = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL); 
     $senha = $_POST['senha'];
 
